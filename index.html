@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Financeiro Profissional</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+  <!-- Script principal -->
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1>Simulador Financeiro</h1>
+    <span class="badge">SELIC Atual</span>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Resumo</h2>
+      <p>Total Investido: <strong id="total">R$ 0,00</strong></p>
+    </section>
+
+    <section class="card">
+      <h2>Evolução</h2>
+      <canvas id="graficoPrincipal"></canvas>
+    </section>
+  </main>
+</body>
+</html>
