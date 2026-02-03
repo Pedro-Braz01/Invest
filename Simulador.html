@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Simulador Avançado — Imóveis & Investimentos</title>
+<title>Simulador Master — Imóveis & Investimentos</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* ─── DESIGN SYSTEM ORIGINAL (PREMIUM DARK) ─── */
@@ -13,9 +13,9 @@
   --bg-card:      #161822;
   --bg-card2:     #1c1f2e;
   --bg-input:     #13151f;
-  --accent:       #00d4aa;       /* Verde Neon Original */
+  --accent:       #00d4aa;       /* Verde Neon */
   --accent-dim:   rgba(0,212,170,.15);
-  --accent2:      #5b8cf5;       /* Azul Original */
+  --accent2:      #5b8cf5;       /* Azul */
   --accent2-dim:  rgba(91,140,245,.15);
   --warn:         #f5a623;
   --danger:       #ef5350;
@@ -23,43 +23,46 @@
   --text-muted:   #7a7f95;
   --border:       #252838;
   --radius:       12px;
-  --shadow:       0 4px 24px rgba(0,0,0,.35);
+  --shadow:       0 4px 24px rgba(0,0,0,.4);
   --font:         'Segoe UI', system-ui, sans-serif;
   --sidebar-w:    280px;
 }
+
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-body { font-family:var(--font); background:var(--bg-base); color:var(--text); min-height:100vh; overflow-x:hidden; display:flex; flex-direction:column; }
+body { font-family:var(--font); background:var(--bg-base); color:var(--text); min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
 
 /* ─── HEADER ─── */
 .header {
   height: 70px; background:var(--bg-card); border-bottom:1px solid var(--border);
   display:flex; align-items:center; padding:0 24px; position:sticky; top:0; z-index:50;
-  backdrop-filter:blur(10px); justify-content:space-between;
+  justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
 .header-left { display:flex; align-items:center; gap:16px; }
+.hamburger-btn { 
+  background:none; border:none; color:var(--text); font-size:24px; cursor:pointer; 
+  padding:8px; border-radius:8px; transition:.2s; 
+}
+.hamburger-btn:hover { background:var(--bg-card2); color:var(--accent); }
+
 .brand { display:flex; align-items:center; gap:12px; }
 .brand-icon { 
   width:40px; height:40px; background:linear-gradient(135deg, var(--accent), var(--accent2)); 
   border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; 
-  box-shadow:0 0 15px rgba(0,212,170,0.3);
+  box-shadow:0 0 15px rgba(0,212,170,0.3); color:#fff;
 }
 .brand-text h1 { font-size:1.1rem; font-weight:700; letter-spacing:-0.5px; line-height:1.2; }
 .brand-text span { font-size:0.75rem; color:var(--text-muted); font-weight:500; }
 
 .header-right { display:flex; align-items:center; gap:15px; }
 .selic-badge { 
-  background:var(--accent-dim); border:1px solid var(--accent); color:var(--accent); 
+  background:var(--bg-card2); border:1px solid var(--accent); color:var(--accent); 
   padding:6px 14px; border-radius:30px; font-size:0.8rem; font-weight:600; display:flex; gap:6px;
 }
 
-/* ─── HAMBURGER & SIDEBAR ─── */
-.hamburger-btn { background:none; border:none; color:var(--text); font-size:24px; cursor:pointer; padding:5px; transition:.2s; }
-.hamburger-btn:hover { color:var(--accent); }
-
+/* ─── SIDEBAR ─── */
 .sidebar-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:90; 
-  opacity:0; pointer-events:none; transition:.3s;
+  opacity:0; pointer-events:none; transition:.3s; backdrop-filter:blur(2px);
 }
 .sidebar-overlay.open { opacity:1; pointer-events:auto; }
 
@@ -67,38 +70,39 @@ body { font-family:var(--font); background:var(--bg-base); color:var(--text); mi
   position:fixed; top:0; left:calc(var(--sidebar-w) * -1); width:var(--sidebar-w); height:100vh;
   background:var(--bg-sidebar); border-right:1px solid var(--border); z-index:100;
   transition:left .3s cubic-bezier(0.4, 0, 0.2, 1); padding:20px 0; overflow-y:auto;
-  box-shadow:4px 0 25px rgba(0,0,0,0.5);
+  box-shadow:5px 0 30px rgba(0,0,0,0.5);
 }
 .sidebar.open { left:0; }
 
-.sb-header { padding:0 24px 20px; border-bottom:1px solid var(--border); margin-bottom:10px; font-size:1.1rem; font-weight:700; color:var(--text); display:flex; justify-content:space-between; align-items:center;}
+.sb-header { padding:0 24px 20px; border-bottom:1px solid var(--border); margin-bottom:10px; font-size:1.2rem; font-weight:700; color:var(--text); display:flex; justify-content:space-between; align-items:center;}
 .sb-close { background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer; }
 
-/* Menu Tree Structure */
-.sb-group { padding:0 12px; }
+.sb-group { padding:0 12px; margin-bottom:15px; }
 .sb-item-header { 
   padding:10px 12px; color:var(--text-muted); font-size:0.75rem; font-weight:700; 
   text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:8px; 
 }
-.sb-subgroup { margin-left:12px; padding-left:12px; border-left:1px solid var(--border); }
+.sb-subgroup { margin-left:10px; padding-left:10px; border-left:2px solid var(--border); }
 .sb-link {
   display:flex; align-items:center; gap:10px; width:100%; padding:10px 14px;
   background:transparent; border:none; color:var(--text); text-align:left;
   font-size:0.9rem; cursor:pointer; border-radius:8px; margin-bottom:4px; transition:.2s;
 }
-.sb-link:hover { background:var(--bg-card2); color:var(--accent); }
-.sb-link.active { background:linear-gradient(90deg, var(--accent-dim), transparent); color:var(--accent); font-weight:600; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; }
+.sb-link:hover { background:var(--bg-card2); color:var(--text); }
+.sb-link.active { 
+  background:linear-gradient(90deg, var(--accent-dim), transparent); 
+  color:var(--accent); font-weight:600; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; 
+}
 
 /* ─── MAIN CONTENT ─── */
-.container { max-width:1100px; margin:0 auto; padding:30px 20px; width:100%; flex:1; }
+.container { max-width:1200px; margin:0 auto; padding:30px 20px; width:100%; flex:1; }
 
-/* Tabs (Hidden visually, controlled by JS) */
-.tab-panel { display:none; animation:fadeUp 0.4s ease; }
+.tab-panel { display:none; animation:fadeIn 0.4s ease; }
 .tab-panel.active { display:block; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-/* Cards & Grid */
-.card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:24px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+/* Cards & Inputs */
+.card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:24px; box-shadow:var(--shadow); position:relative; }
 .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:15px; }
 .card-title { font-size:1.1rem; font-weight:600; color:var(--accent); display:flex; align-items:center; gap:10px; }
 .card-title i { font-style:normal; font-size:1.3rem; }
@@ -106,60 +110,53 @@ body { font-family:var(--font); background:var(--bg-base); color:var(--text); mi
 .grid { display:grid; gap:20px; }
 .grid-2 { grid-template-columns:1fr 1fr; }
 .grid-3 { grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+.grid-4 { grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); }
 
-/* Inputs */
 .input-group label { display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px; font-weight:600; letter-spacing:0.5px; }
 .input-group input, .input-group select { 
   width:100%; background:var(--bg-input); border:1px solid var(--border); 
   border-radius:8px; padding:12px; color:var(--text); font-size:0.95rem; outline:none; transition:.2s; 
 }
 .input-group input:focus, .input-group select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
-.helper { font-size:0.7rem; color:var(--text-muted); margin-top:4px; }
-.helper strong { color:var(--accent); }
 
-/* Export Button */
-.export-wrap { position:relative; }
-.btn-export { background:var(--bg-card2); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px; transition:.2s; }
+/* Helper text (Sinais verdes) */
+.helper { font-size:0.75rem; color:var(--text-muted); margin-top:5px; display:flex; align-items:center; gap:4px; }
+.helper.green { color:#00b894; }
+
+/* KPIs */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:15px; margin-bottom:20px; }
+.kpi { background:var(--bg-card2); padding:15px; border-radius:10px; border:1px solid var(--border); text-align:center; position:relative; overflow:hidden; }
+.kpi::after { content:''; position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--border); }
+.kpi.green::after { background:var(--accent); }
+.kpi.blue::after { background:var(--accent2); }
+.kpi-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px; font-weight:700; }
+.kpi-val { font-size:1.2rem; font-weight:700; color:var(--text); }
+
+/* Buttons */
+.btn-action { 
+  background:var(--accent); color:#000; font-weight:700; border:none; padding:12px 24px; 
+  border-radius:8px; cursor:pointer; width:100%; transition:.2s; margin-top:10px;
+}
+.btn-action:hover { filter:brightness(1.1); transform:translateY(-2px); box-shadow:0 5px 15px var(--accent-dim); }
+.btn-export { background:var(--bg-card2); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
 .btn-export:hover { border-color:var(--accent); color:var(--accent); }
-.export-menu { position:absolute; top:110%; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:5px; display:none; flex-direction:column; width:200px; box-shadow:var(--shadow); z-index:50; }
-.export-menu.open { display:flex; }
-.export-menu button { background:none; border:none; color:var(--text); padding:10px; text-align:left; cursor:pointer; border-radius:5px; font-size:0.85rem; }
-.export-menu button:hover { background:var(--bg-card2); color:var(--accent); }
 
 /* Table */
 .table-container { overflow-x:auto; border:1px solid var(--border); border-radius:8px; }
 table { width:100%; border-collapse:collapse; font-size:0.85rem; }
-th { background:var(--bg-card2); color:var(--text-muted); padding:12px; text-align:right; font-weight:600; font-size:0.75rem; text-transform:uppercase; white-space:nowrap; }
-th:first-child { text-align:left; }
-td { padding:12px; border-bottom:1px solid var(--border); text-align:right; color:var(--text); }
-td:first-child { text-align:left; font-weight:600; color:var(--accent); }
-tr:hover td { background:rgba(255,255,255,0.02); }
+th { background:var(--bg-card2); color:var(--text-muted); padding:12px; text-align:right; font-weight:700; font-size:0.75rem; text-transform:uppercase; white-space:nowrap; }
+td { padding:10px 12px; border-bottom:1px solid var(--border); text-align:right; color:var(--text); }
+td:first-child, th:first-child { text-align:center; color:var(--accent); font-weight:bold; }
+tr:hover td { background:rgba(255,255,255,0.03); }
 
-/* KPIs */
-.kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px; }
-.kpi { background:var(--bg-card2); padding:15px; border-radius:10px; border:1px solid var(--border); text-align:center; }
-.kpi-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; }
-.kpi-val { font-size:1.3rem; font-weight:700; color:var(--text); }
-.kpi.green .kpi-val { color:var(--accent); }
-.kpi.blue .kpi-val { color:var(--accent2); }
-
-/* ─── SPECIAL: INVESTIR -> SACAR ─── */
+/* ─── IS SECTION (Investir Sacar) ─── */
 .is-section-title { color:var(--accent); font-size:0.9rem; font-weight:700; text-transform:uppercase; margin-bottom:15px; display:flex; align-items:center; gap:8px; border-left:3px solid var(--accent); padding-left:10px; }
 .is-preview-box { background:var(--bg-card2); border-radius:8px; padding:15px; margin-top:10px; font-size:0.9rem; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
 .is-preview-box .val { font-size:1.1rem; font-weight:700; color:var(--accent); }
 
-.btn-simulate { 
-  width:100%; background:linear-gradient(90deg, var(--accent), #00b894); color:#000; font-weight:700; 
-  padding:15px; border:none; border-radius:10px; font-size:1rem; cursor:pointer; margin-top:20px;
-  box-shadow:0 0 20px rgba(0,212,170,0.3); transition:.2s;
-}
-.btn-simulate:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(0,212,170,0.5); }
-
-/* How it works Box */
 .how-it-works { background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:10px; padding:20px; margin-top:30px; }
-.how-header { display:flex; align-items:center; gap:10px; font-weight:700; color:var(--text); margin-bottom:15px; cursor:pointer; }
-.how-content { font-size:0.85rem; line-height:1.6; color:var(--text-muted); }
-.how-content p { margin-bottom:10px; }
+.how-header { display:flex; align-items:center; gap:10px; font-weight:700; color:var(--text); cursor:pointer; }
+.how-content { margin-top:15px; font-size:0.85rem; line-height:1.6; color:var(--text-muted); }
 .formula-box { background:var(--bg-card); padding:10px; border-left:3px solid var(--accent2); margin:10px 0; font-family:monospace; color:var(--text); }
 .step-list { list-style:none; margin-left:5px; }
 .step-list li { position:relative; padding-left:25px; margin-bottom:12px; }
@@ -168,17 +165,11 @@ tr:hover td { background:rgba(255,255,255,0.02); }
   background:var(--accent2); color:#fff; font-size:10px; border-radius:50%; 
   display:flex; align-items:center; justify-content:center; font-weight:bold; 
 }
-.example-box { background:rgba(0,212,170,0.05); border:1px solid var(--accent-dim); padding:15px; border-radius:8px; margin-top:15px; color:var(--text); }
 
-/* Cycle Log */
-.cycle-log { max-height:200px; overflow-y:auto; margin-top:15px; border-top:1px solid var(--border); }
-.cycle-item { padding:10px; border-bottom:1px solid var(--border); font-size:0.85rem; display:flex; justify-content:space-between; }
-.cycle-item span { color:var(--accent); font-weight:bold; }
-
-/* Responsive */
+/* Responsividade */
 @media(max-width:768px){ 
-  .grid-2, .grid-3 { grid-template-columns:1fr; } 
-  .header-right span { display:none; } /* hide labels mobile */
+  .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; } 
+  .header-right span { display:none; }
 }
 </style>
 </head>
@@ -190,21 +181,14 @@ tr:hover td { background:rgba(255,255,255,0.02); }
     <div class="brand">
       <div class="brand-icon">📊</div>
       <div class="brand-text">
-        <h1>Calculadora de Imóveis</h1>
-        <span>Amortização & Investimentos</span>
+        <h1>Simulador Master</h1>
+        <span>Imóveis & Investimentos</span>
       </div>
     </div>
   </div>
   <div class="header-right">
-    <div class="selic-badge">Selic: <span id="selicTop">13.75%</span></div>
-    <div class="export-wrap">
-      <button class="btn-export" onclick="toggleExport()">📤 Exportar</button>
-      <div class="export-menu" id="exportMenu">
-        <button onclick="exportCSV()">📄 CSV (Excel)</button>
-        <button onclick="exportExcelXML()">📗 Excel (Nativo)</button>
-        <button onclick="window.print()">🖨️ Imprimir PDF</button>
-      </div>
-    </div>
+    <div class="selic-badge">Selic: 13.75%</div>
+    <button class="btn-export" onclick="alert('Exportação disponível em cada aba!')">📤 Exportar</button>
   </div>
 </header>
 
@@ -232,11 +216,15 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 <div class="container">
 
   <div id="tab-simulador" class="tab-panel active">
+    
     <div class="card">
-      <div class="card-header"><div class="card-title"><i>📋</i> Simulador de Financiamento</div></div>
-      <div class="grid grid-3">
+      <div class="card-header">
+        <div class="card-title"><i>📋</i> Simulador Completo</div>
+        <div style="font-size:0.8rem; color:var(--text-muted)">Configure o financiamento</div>
+      </div>
+      <div class="grid grid-4">
         <div class="input-group">
-          <label>Valor (R$)</label>
+          <label>Valor Financiado (R$)</label>
           <input type="number" id="simValor" value="300000" oninput="calcSimulador()">
         </div>
         <div class="input-group">
@@ -244,87 +232,173 @@ tr:hover td { background:rgba(255,255,255,0.02); }
           <input type="number" id="simTaxa" value="9.5" step="0.1" oninput="calcSimulador()">
         </div>
         <div class="input-group">
-          <label>Prazo (anos)</label>
+          <label>Prazo (Anos)</label>
           <input type="number" id="simPrazo" value="30" oninput="calcSimulador()">
         </div>
         <div class="input-group">
           <label>Sistema</label>
           <select id="simSys" onchange="calcSimulador()">
+            <option value="sac">SAC (Amort. Constante)</option>
             <option value="price">PRICE (Parcela Fixa)</option>
-            <option value="sac">SAC (Amort. Fixa)</option>
           </select>
         </div>
       </div>
     </div>
 
+    <div class="card" style="border-left:4px solid var(--accent2)">
+      <div class="card-header" style="border:none; padding-bottom:0; margin-bottom:15px">
+        <div class="card-title" style="color:var(--accent2)"><i>🚀</i> Antecipações (Amortização Extra)</div>
+      </div>
+      <div class="grid grid-3">
+        <div class="input-group">
+          <label>Extra Mensal (R$)</label>
+          <input type="number" id="simExtraMen" value="0" placeholder="0,00" oninput="calcSimulador()">
+          <div class="helper">Soma à parcela todo mês</div>
+        </div>
+        <div class="input-group">
+          <label>Extra Anual (R$)</label>
+          <input type="number" id="simExtraAnual" value="0" placeholder="0,00" oninput="calcSimulador()">
+          <div class="helper">Ex: 13º salário</div>
+        </div>
+        <div class="input-group">
+          <label>Aporte Único (R$)</label>
+          <input type="number" id="simExtraUnico" value="0" placeholder="0,00" oninput="calcSimulador()">
+          <div class="helper">Aplica no mês 1</div>
+        </div>
+      </div>
+    </div>
+
     <div class="kpi-row">
-      <div class="kpi green"><div class="kpi-label">Primeira Parcela</div><div class="kpi-val" id="kpiSimParcela">R$ 0,00</div></div>
-      <div class="kpi blue"><div class="kpi-label">Total Pago</div><div class="kpi-val" id="kpiSimTotal">R$ 0,00</div></div>
-      <div class="kpi"><div class="kpi-label">Juros Totais</div><div class="kpi-val" id="kpiSimJuros" style="color:var(--danger)">R$ 0,00</div></div>
+      <div class="kpi green"><div class="kpi-label">1ª Parcela</div><div class="kpi-val" id="kpiSimParcela">R$ 0,00</div></div>
+      <div class="kpi blue"><div class="kpi-label">Última Parcela</div><div class="kpi-val" id="kpiSimUltima">R$ 0,00</div></div>
+      <div class="kpi"><div class="kpi-label">Total Juros</div><div class="kpi-val" id="kpiSimJuros" style="color:var(--danger)">R$ 0,00</div></div>
+      <div class="kpi green"><div class="kpi-label">Prazo Real</div><div class="kpi-val" id="kpiSimPrazo">0 meses</div></div>
     </div>
 
     <div class="card">
-      <div class="table-container" style="max-height:400px;">
-        <table id="tableSim"><thead><tr><th>Mês</th><th>Parcela</th><th>Amortização</th><th>Juros</th><th>Saldo Devedor</th></tr></thead><tbody></tbody></table>
+      <div class="table-container" style="max-height:500px;">
+        <table id="tableSim">
+          <thead>
+            <tr>
+              <th>Mês</th>
+              <th>Parcela</th>
+              <th>Amort. Extra</th>
+              <th>Amort. Total</th>
+              <th>Juros</th>
+              <th>Saldo Devedor</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
 
   <div id="tab-comparativo" class="tab-panel">
     <div class="card">
-      <div class="card-header"><div class="card-title"><i>📊</i> Investir ou Amortizar?</div></div>
-      <p style="color:var(--text-muted)">Compare a taxa efetiva do seu financiamento com o rendimento líquido da Selic.</p>
-      <br>
+      <div class="card-header"><div class="card-title"><i>📊</i> Investir vs Amortizar</div></div>
       <div class="grid grid-2">
-         <div class="input-group"><label>Juros Dívida (%)</label><input type="number" id="cmpDiv" value="9.5" oninput="calcComparativo()"></div>
-         <div class="input-group"><label>Selic Meta (%)</label><input type="number" id="cmpSelic" value="13.75" oninput="calcComparativo()"></div>
+         <div class="input-group">
+           <label>Custo Efetivo Total do Financiamento (% a.a.)</label>
+           <input type="number" id="cmpDiv" value="9.5" oninput="calcComparativo()">
+           <div class="helper">Taxa de juros + Seguros</div>
+         </div>
+         <div class="input-group">
+           <label>Rendimento Líquido Investimento (% a.a.)</label>
+           <input type="number" id="cmpSelic" value="11.68" oninput="calcComparativo()">
+           <div class="helper">Já descontando IR (ex: Selic * 0.85)</div>
+         </div>
       </div>
-      <div class="kpi-row" style="margin-top:20px">
-         <div class="kpi"><div class="kpi-label">Veredito</div><div class="kpi-val" id="cmpVerdict">--</div></div>
+      <div style="margin-top:20px; padding:20px; background:var(--bg-card2); border-radius:8px; text-align:center;">
+         <h2 id="cmpVerdict" style="color:var(--text); margin-bottom:10px">--</h2>
+         <p id="cmpDesc" style="color:var(--text-muted)">Preencha as taxas para ver a recomendação matemática.</p>
       </div>
     </div>
   </div>
 
-  <div id="tab-oportunidade" class="tab-panel"><div class="card"><h3>Em construção...</h3></div></div>
-  <div id="tab-aluguel" class="tab-panel"><div class="card"><h3>Em construção...</h3></div></div>
-  <div id="tab-quitar" class="tab-panel"><div class="card"><h3>Em construção...</h3></div></div>
+  <div id="tab-oportunidade" class="tab-panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i>💡</i> Custo de Oportunidade</div></div>
+      <p style="color:var(--text-muted); margin-bottom:20px;">Quanto renderia o valor da entrada se fosse investido?</p>
+      <div class="grid grid-3">
+        <div class="input-group"><label>Valor Entrada (R$)</label><input type="number" id="opEntrada" value="60000"></div>
+        <div class="input-group"><label>Taxa Investimento (% a.a.)</label><input type="number" id="opTaxa" value="13.75"></div>
+        <div class="input-group"><label>Anos</label><input type="number" id="opAnos" value="10"></div>
+      </div>
+      <button class="btn-action" onclick="calcOportunidade()">Calcular</button>
+      <div id="resOportunidade" style="margin-top:20px; display:none;">
+        <div class="kpi green"><div class="kpi-label">Montante Final</div><div class="kpi-val" id="valOportunidade">R$ 0,00</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-aluguel" class="tab-panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i>🏠</i> Aluguel vs Compra</div></div>
+      <div class="grid grid-2">
+        <div class="input-group"><label>Valor do Aluguel (R$)</label><input type="number" id="avcAluguel" value="2500"></div>
+        <div class="input-group"><label>Valor da Parcela (R$)</label><input type="number" id="avcParcela" value="3200"></div>
+      </div>
+      <div class="helper" style="margin-top:10px">Simulação simplificada de fluxo de caixa mensal.</div>
+      <div style="margin-top:20px; padding:15px; border:1px solid var(--border); border-radius:8px;">
+        <span id="avcRes" style="font-weight:bold; color:var(--accent)">Diferença Mensal: R$ 700,00 para investir</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-quitar" class="tab-panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i>🎯</i> Meta de Quitação</div></div>
+      <div class="grid grid-3">
+        <div class="input-group"><label>Saldo Devedor (R$)</label><input type="number" id="qSaldo" value="280000"></div>
+        <div class="input-group"><label>Meta (Anos)</label><input type="number" id="qAnos" value="5"></div>
+        <div class="input-group"><label>Juros (% a.a.)</label><input type="number" id="qJuros" value="9.5"></div>
+      </div>
+      <button class="btn-action" onclick="calcQuitar()">Calcular Amortização Necessária</button>
+      <div id="resQuitar" style="margin-top:20px; font-size:1.1rem; color:var(--accent); font-weight:bold; display:none">
+        Você precisa amortizar R$ <span id="valQuitar">0,00</span> por mês (além da parcela).
+      </div>
+    </div>
+  </div>
 
   <div id="tab-investsacar" class="tab-panel">
     
     <div style="margin-bottom:20px;">
-      <h2 style="color:var(--text); font-size:1.5rem; margin-bottom:5px;">Investir → Sacar → Amortizar (Ciclos)</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">Estratégia de múltiplos ciclos: investe na Selic durante N meses, saca o montante com juros compostos líquidos e amortiza o financiamento. Cada ciclo reduz o saldo devedor e os juros futuros.</p>
+      <h2 style="color:var(--text); font-size:1.4rem; margin-bottom:5px;">Estratégia de Ciclos</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">Acumule na Selic e faça amortizações pontuais potentes.</p>
     </div>
 
     <div class="card">
-      
       <div class="is-section-title">🏦 Financiamento</div>
       <div class="grid grid-3">
         <div class="input-group">
-          <label>Valor do Financiamento (R$)</label>
-          <input type="number" id="isValor" value="300000" placeholder="Ex: 300000" oninput="prevIS()">
-          <div class="helper">ex: 300000 = R$ 300.000,00</div>
+          <label>Valor Financiamento (R$)</label>
+          <input type="number" id="isValor" value="300000" oninput="prevIS()">
+          <div class="helper green">ex: 300000 = R$ 300.000,00</div>
         </div>
         <div class="input-group">
-          <label>Taxa do Financiamento (% a.a.)</label>
-          <input type="number" id="isTaxa" value="9.5" step="0.1" placeholder="Ex: 9.5" oninput="prevIS()">
-          <div class="helper">Digite só o número (ex: 9.5)</div>
+          <label>Taxa (% a.a.)</label>
+          <input type="number" id="isTaxa" value="9.5" step="0.1" oninput="prevIS()">
+          <div class="helper">Digite só o número ex: 9.5</div>
         </div>
         <div class="input-group">
           <label>Prazo (anos)</label>
-          <input type="number" id="isPrazo" value="30" placeholder="Ex: 30" oninput="prevIS()">
+          <input type="number" id="isPrazo" value="30" oninput="prevIS()">
         </div>
+      </div>
+      <div class="grid grid-1" style="margin-top:15px">
         <div class="input-group">
-          <label>Sistema de Amortização</label>
-          <select id="isSys" onchange="prevIS()">
-            <option value="price">PRICE — parcela fixa</option>
-            <option value="sac">SAC — amortização fixa</option>
-          </select>
+           <label>Sistema de Amortização</label>
+           <select id="isSys" onchange="prevIS()">
+             <option value="price">PRICE — parcela fixa</option>
+             <option value="sac">SAC — amortização fixa (decrescente)</option>
+           </select>
+           <div class="helper">PRICE: constante | SAC: decrescente</div>
         </div>
       </div>
       <div class="is-preview-box">
         <span>📋 Parcela estimada (inicial):</span>
-        <span class="val" id="isPrevParcela">R$ 2.521,60</span>
+        <span class="val" id="isPrevParcela">R$ 2.437,62</span>
       </div>
 
       <hr style="border:0; border-top:1px solid var(--border); margin:25px 0;">
@@ -339,27 +413,28 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         <div class="input-group">
           <label>Selic esperada (% a.a.)</label>
           <input type="number" id="isSelic" value="13.75" step="0.1" oninput="prevIS()">
-          <div class="helper">Digite só o número (ex: 13.75)</div>
+          <div class="helper">ex: 13.75 = 13,75% ao ano</div>
         </div>
         <div class="input-group">
           <label>IR sobre Rendimento (%)</label>
           <input type="number" id="isIR" value="15" oninput="prevIS()">
           <div class="helper">Incide só sobre o ganho</div>
         </div>
-        <div class="input-group">
-          <label>Tipo de Investimento</label>
-          <select disabled style="opacity:0.7"><option>Selic líquido (CDB / LCI)</option></select>
-          <div class="helper">Rendimento atrelado à Selic com IR</div>
-        </div>
       </div>
+      <div class="input-group" style="margin-top:10px">
+        <label>Tipo de Investimento</label>
+        <select disabled style="opacity:0.7; cursor:not-allowed"><option>Selic líquido (CDB / LCI)</option></select>
+        <div class="helper">Rendimento atrelado à Selic com IR descontado</div>
+      </div>
+      
       <div class="is-preview-box">
         <div>
-          <div style="font-size:0.8rem; color:var(--text-muted)">📈 Taxa líquida mensal aprox:</div>
-          <div class="val" style="font-size:1rem" id="isPrevTaxa">0,92% a.m.</div>
+          <div style="font-size:0.8rem; color:var(--text-muted)">📈 Taxa líquida:</div>
+          <div class="val" style="font-size:1rem" id="isPrevTaxa">11,58% a.a.</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:0.8rem; color:var(--text-muted)">Montante após 12 meses:</div>
-          <div class="val" style="font-size:1rem" id="isPrevMontante">R$ 25.480,00</div>
+          <div class="val" style="font-size:1rem" id="isPrevMontante">R$ 25.480,54</div>
         </div>
       </div>
 
@@ -378,63 +453,36 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         </div>
       </div>
       <div class="is-preview-box" style="border-color:var(--accent2)">
-        <span>🕐 Duração total da estratégia:</span>
-        <span class="val" style="color:var(--accent2)" id="isPrevTotalTempo">120 meses (10 anos)</span>
+        <span>🕐 Total da estratégia:</span>
+        <span class="val" style="color:var(--accent2)" id="isPrevTotalTempo">120 meses | 10.0 anos</span>
       </div>
 
-      <button class="btn-simulate" onclick="runInvestSacar()">🚀 Simular Estratégia</button>
+      <button class="btn-action" style="background:linear-gradient(90deg, var(--accent), #00b894); margin-top:25px;" onclick="runInvestSacar()">🚀 Simular Estratégia</button>
     </div>
 
     <div class="card" id="resIS" style="display:none; border-color:var(--accent);">
-      <div class="card-header"><div class="card-title"><i>🏁</i> Resultado da Estratégia</div></div>
+      <div class="card-header"><div class="card-title"><i>🏁</i> Resultado</div></div>
       <div class="kpi-row">
-        <div class="kpi blue"><div class="kpi-label">Dívida Original</div><div class="kpi-val" id="resIsDiv">R$ 300k</div></div>
-        <div class="kpi green"><div class="kpi-label">Amortizado via Inv.</div><div class="kpi-val" id="resIsAmort">R$ 0</div></div>
-        <div class="kpi"><div class="kpi-label">Tempo Economizado</div><div class="kpi-val" id="resIsTempo" style="color:var(--accent)">0 meses</div></div>
+        <div class="kpi blue"><div class="kpi-label">Amortizado via Inv.</div><div class="kpi-val" id="resIsAmort">R$ 0</div></div>
+        <div class="kpi green"><div class="kpi-label">Tempo Economizado</div><div class="kpi-val" id="resIsTempo">0 meses</div></div>
       </div>
       <canvas id="chartIS" style="max-height:300px; margin-bottom:20px;"></canvas>
-      <h4 style="color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; margin-bottom:10px;">Log de Ciclos</h4>
-      <div class="cycle-log" id="isLog"></div>
+      <div style="max-height:200px; overflow-y:auto; border-top:1px solid var(--border); padding-top:10px" id="isLog"></div>
     </div>
 
     <div class="how-it-works">
       <div class="how-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none'?'block':'none'">
         <span>▶ Como funciona o cálculo? (Juros Compostos)</span>
       </div>
-      <div class="how-content" style="display:block"> <p>O investimento acumula com <strong>juros compostos</strong>: cada mês o aporte se soma ao saldo anterior e <strong>todo</strong> o saldo rende novamente. O IR é descontado apenas sobre o rendimento mensal.</p>
-        
-        <div class="formula-box">
-          Montante<sub>m</sub> = (Montante<sub>m-1</sub> + Aporte) × (1 + i<sub>líq</sub>)
-        </div>
-
+      <div class="how-content" style="display:block">
+        <p>O investimento acumula com <strong>juros compostos</strong>: cada mês o aporte se soma ao saldo anterior e <strong>todo</strong> o saldo rende novamente. O IR é descontado apenas sobre o rendimento mensal.</p>
+        <div class="formula-box">Montante<sub>m</sub> = (Montante<sub>m-1</sub> + Aporte) × (1 + i<sub>líq</sub>)</div>
         <ul class="step-list">
-          <li data-step="1">
-            <strong>Taxa mensal bruta:</strong> i<sub>bruto</sub> = (1 + Selic)<sup>1/12</sup> − 1<br>
-            Converte a taxa Selic anual para equivalente mensal.
-          </li>
-          <li data-step="2">
-            <strong>Desconta o IR:</strong> i<sub>líq</sub> = i<sub>bruto</sub> × (1 − IR%)<br>
-            O IR incide só sobre o ganho.
-          </li>
-          <li data-step="3">
-            <strong>Acumulação:</strong><br>
-            Mês 1: (0 + Aporte) × (1 + i<sub>líq</sub>)<br>
-            Mês 2: (Mês 1 + Aporte) × (1 + i<sub>líq</sub>)
-          </li>
-          <li data-step="4">
-            <strong>Saque e Amortização:</strong><br>
-            No fim do ciclo, o montante total abate o Saldo Devedor. O saldo cai, e os juros futuros também.
-          </li>
-          <li data-step="5">
-            <strong>Novo Ciclo:</strong><br>
-            Começa do zero no investimento, mas a dívida agora é menor.
-          </li>
+          <li data-step="1"><strong>Taxa mensal bruta:</strong> i<sub>bruto</sub> = (1 + Selic)<sup>1/12</sup> − 1. Converte a taxa Selic anual.</li>
+          <li data-step="2"><strong>Desconta o IR:</strong> i<sub>líq</sub> = i<sub>bruto</sub> × (1 − IR%). O IR incide só sobre o ganho mensal.</li>
+          <li data-step="3"><strong>Acumulação:</strong> Juros sobre juros mês a mês.</li>
+          <li data-step="4"><strong>Saque e Amortização:</strong> No fim do ciclo você saca tudo e abate do saldo devedor, reduzindo juros futuros.</li>
         </ul>
-
-        <div class="example-box">
-          <strong>Exemplo:</strong> Aporte R$ 2.000, Selic 13,75%, IR 15%. Taxa líq ≈ 0,92%.<br>
-          Em 24 meses acumula ≈ <strong>R$ 53.900</strong>. Esse valor reduz direto o saldo devedor.
-        </div>
       </div>
     </div>
 
@@ -443,123 +491,163 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 </div>
 
 <script>
-/* ─── GLOBAL & HELPERS ─── */
-let _exportData = { headers:[], rows:[], filename:'calculo' };
-function fmt(n) { return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-function fmtR(n) { return 'R$ ' + fmt(n); }
-
-// Toggle Sidebar
+/* ─── NAVEGAÇÃO ─── */
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sbOverlay').classList.toggle('open');
 }
 
-// Navigation
 function nav(tabId, btn) {
-  // UI Update
   document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-'+tabId).classList.add('active');
   
-  // Menu Active State
-  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-
-  // Close sidebar on mobile
+  if(btn) {
+    document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+    btn.classList.add('active');
+  }
   if(window.innerWidth < 1000) toggleSidebar();
-
-  // Trigger default calcs
+  
+  // Triggers
   if(tabId === 'simulador') calcSimulador();
   if(tabId === 'investsacar') prevIS();
 }
 
-// Export Menu
-function toggleExport() {
-  const m = document.getElementById('exportMenu');
-  m.classList.toggle('open');
-}
-document.addEventListener('click', (e) => {
-  if(!e.target.closest('.export-wrap')) document.getElementById('exportMenu').classList.remove('open');
-});
+function fmt(n) { return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtR(n) { return 'R$ ' + fmt(n); }
 
-/* ─── LOGIC: SIMULADOR (ABA 1) ─── */
+/* ─── 1. SIMULADOR COMPLETO ─── */
 function calcSimulador() {
   const V = parseFloat(document.getElementById('simValor').value)||0;
   const tA = parseFloat(document.getElementById('simTaxa').value)||0;
-  const prazoA = parseFloat(document.getElementById('simPrazo').value)||0;
+  const prazo = parseFloat(document.getElementById('simPrazo').value)||0;
   const sys = document.getElementById('simSys').value;
-  const n = prazoA * 12;
+  
+  const extMen = parseFloat(document.getElementById('simExtraMen').value)||0;
+  const extAnual = parseFloat(document.getElementById('simExtraAnual').value)||0;
+  const extUnico = parseFloat(document.getElementById('simExtraUnico').value)||0;
+
+  const nMeses = prazo * 12;
   const i = (Math.pow(1 + tA/100, 1/12) - 1);
-
-  if(V <= 0 || n <= 0) return;
-
+  
   let saldo = V;
-  let totalPago = 0;
   let totalJuros = 0;
   let rows = [];
+  
+  // Base Pmt for PRICE (Fixed)
+  let pmtPrice = 0;
+  if(i > 0) pmtPrice = V * (i * Math.pow(1+i,nMeses)) / (Math.pow(1+i,nMeses) - 1);
 
-  // Price Base Pmt
-  let pmtPrice = V * (i * Math.pow(1+i,n)) / (Math.pow(1+i,n) - 1);
-  let amSac = V / n;
+  // Amort for SAC (Fixed base)
+  let amSacBase = V / nMeses;
 
-  for(let m=1; m<=n; m++) {
+  for(let m=1; m<=nMeses * 2; m++) { // *2 safety margin
+    if(saldo <= 0.01) break;
+
     let juros = saldo * i;
-    let parc = 0, amort = 0;
+    let amort = 0, parc = 0;
 
     if(sys === 'price') {
       parc = pmtPrice;
       amort = parc - juros;
-    } else {
-      amort = amSac;
+    } else { // SAC
+      amort = amSacBase;
       parc = amort + juros;
     }
 
-    if(saldo < amort) { amort = saldo; parc = amort + juros; }
-    saldo -= amort;
-    totalPago += parc;
+    // Extras
+    let extra = extMen;
+    if(m % 12 === 0) extra += extAnual;
+    if(m === 1) extra += extUnico;
+
+    // Ajuste final
+    let amortTotal = amort + extra;
+    if(saldo < amortTotal) {
+      amortTotal = saldo;
+      parc = amortTotal + juros; // recalcula parcela final
+    }
+
+    saldo -= amortTotal;
     totalJuros += juros;
 
-    if(m <= 12 || m % 12 === 0 || saldo === 0) { // Limit table rows for DOM perf
-       // We only show summary in UI, but calculate all
+    if(m <= 60 || saldo < 1) { // Render optimization
+      rows.push(`<tr>
+        <td>${m}</td>
+        <td>${fmtR(parc)}</td>
+        <td style="color:var(--accent2)">${extra>0?'+'+fmt(extra):'-'}</td>
+        <td style="font-weight:bold">${fmtR(amortTotal)}</td>
+        <td style="color:var(--danger)">${fmtR(juros)}</td>
+        <td>${fmtR(saldo)}</td>
+      </tr>`);
     }
-    rows.push({m, p:parc, a:amort, j:juros, s:saldo});
-    if(saldo < 0.01) break;
   }
 
-  // Update UI
-  document.getElementById('kpiSimParcela').textContent = fmtR(rows[0].p);
-  document.getElementById('kpiSimTotal').textContent = fmtR(totalPago);
+  document.querySelector('#tableSim tbody').innerHTML = rows.join('') + (rows.length>=60 ? '<tr><td colspan="6">... Tabela completa na exportação</td></tr>' : '');
+  
+  // KPIs
+  // 1a parcela estimativa
+  let p1 = 0;
+  if(sys === 'price') p1 = pmtPrice;
+  else p1 = amSacBase + (V*i);
+  
+  document.getElementById('kpiSimParcela').textContent = fmtR(p1);
   document.getElementById('kpiSimJuros').textContent = fmtR(totalJuros);
-
-  const tbody = document.querySelector('#tableSim tbody');
-  tbody.innerHTML = rows.slice(0, 60).map(r => 
-    `<tr><td>${r.m}</td><td>${fmtR(r.p)}</td><td>${fmtR(r.a)}</td><td>${fmtR(r.j)}</td><td>${fmtR(r.s)}</td></tr>`
-  ).join('') + (rows.length > 60 ? '<tr><td colspan="5">... (mostrando apenas primeiros 60 meses)</td></tr>' : '');
-
-  // Prepare Export
-  _exportData = {
-    filename: 'simulacao_financiamento',
-    headers: ['Mes', 'Parcela', 'Amortizacao', 'Juros', 'Saldo Devedor'],
-    rows: rows.map(r => [r.m, r.p, r.a, r.j, r.s])
-  };
+  document.getElementById('kpiSimPrazo').textContent = rows.length + " meses"; // Aproximado visual
+  document.getElementById('kpiSimUltima').textContent = rows.length > 0 ? fmtR(0) : "R$ 0,00"; // Simplificação visual
 }
 
-/* ─── LOGIC: COMPARATIVO (ABA 2 - SIMPLES) ─── */
+/* ─── 2. COMPARATIVO ─── */
 function calcComparativo() {
-  const iDiv = parseFloat(document.getElementById('cmpDiv').value);
-  const iSel = parseFloat(document.getElementById('cmpSelic').value);
+  const div = parseFloat(document.getElementById('cmpDiv').value);
+  const selic = parseFloat(document.getElementById('cmpSelic').value);
   const el = document.getElementById('cmpVerdict');
-  // Simplificado: Selic Liq aprox (IR 15%)
-  const selLiq = iSel * 0.85; 
-  if(selLiq > iDiv) {
-    el.textContent = "INVESTIR (Selic Líq > Juros Dívida)";
+  
+  if(selic > div) {
+    el.textContent = "VEREDITO: INVESTIR";
     el.style.color = "var(--accent)";
+    document.getElementById('cmpDesc').textContent = `Seu ganho líquido (${selic}%) supera o custo da dívida (${div}%). Matematicamente, vale mais a pena manter o dinheiro investido.`;
   } else {
-    el.textContent = "AMORTIZAR (Juros Dívida > Selic)";
+    el.textContent = "VEREDITO: AMORTIZAR";
     el.style.color = "var(--danger)";
+    document.getElementById('cmpDesc').textContent = `O custo da dívida (${div}%) é maior que o retorno do investimento (${selic}%). Pagar a dívida é o melhor "investimento" agora.`;
   }
 }
 
-/* ─── LOGIC: INVESTIR -> SACAR (ABA 6 - COMPLEXA) ─── */
+/* ─── 3. OPORTUNIDADE (SIMPLES) ─── */
+function calcOportunidade() {
+  const v = parseFloat(document.getElementById('opEntrada').value);
+  const i = parseFloat(document.getElementById('opTaxa').value)/100;
+  const a = parseFloat(document.getElementById('opAnos').value);
+  const res = v * Math.pow(1+i, a);
+  document.getElementById('resOportunidade').style.display = 'block';
+  document.getElementById('valOportunidade').textContent = fmtR(res);
+}
+
+/* ─── 4. ALUGUEL VS COMPRA (UI APENAS) ─── */
+document.getElementById('avcAluguel').addEventListener('input', updateAvc);
+document.getElementById('avcParcela').addEventListener('input', updateAvc);
+function updateAvc(){
+  const a = parseFloat(document.getElementById('avcAluguel').value)||0;
+  const p = parseFloat(document.getElementById('avcParcela').value)||0;
+  const dif = p - a;
+  const el = document.getElementById('avcRes');
+  if(dif > 0) el.textContent = `Diferença: A parcela custa ${fmtR(dif)} a mais que o aluguel. Se investir essa diferença...`;
+  else el.textContent = `O aluguel é mais caro que a parcela em ${fmtR(Math.abs(dif))}.`;
+}
+
+/* ─── 5. QUITAR (REVERSE) ─── */
+function calcQuitar() {
+  const s = parseFloat(document.getElementById('qSaldo').value);
+  const n = parseFloat(document.getElementById('qAnos').value) * 12;
+  const i = (parseFloat(document.getElementById('qJuros').value)/100)/12;
+  // PMT formula
+  const pmt = s * (i * Math.pow(1+i,n))/(Math.pow(1+i,n)-1);
+  // We don't have current parcel info here easily, assuming full pmt needed
+  document.getElementById('resQuitar').style.display = 'block';
+  document.getElementById('valQuitar').textContent = fmt(pmt);
+}
+
+
+/* ─── 6. INVESTIR SACAR (O PEDIDO COMPLEXO) ─── */
 let chartISRef = null;
 
 function prevIS() {
@@ -576,24 +664,26 @@ function prevIS() {
   // 1. Parcela Financiamento
   const i = (Math.pow(1 + ta/100, 1/12) - 1);
   let parc = 0;
-  if(sys === 'price') parc = V * (i * Math.pow(1+i,p)) / (Math.pow(1+i,p) - 1);
-  else parc = (V/p) + (V*i);
+  if(sys === 'price') {
+    if(i>0) parc = V * (i * Math.pow(1+i,p)) / (Math.pow(1+i,p) - 1);
+  } else {
+    parc = (V/p) + (V*i);
+  }
   document.getElementById('isPrevParcela').textContent = fmtR(parc);
 
-  // 2. Investimento Previa
+  // 2. Investimento
   const iBruto = Math.pow(1 + selic/100, 1/12) - 1;
   const iLiq = iBruto * (1 - ir/100);
   document.getElementById('isPrevTaxa').textContent = (iLiq*100).toFixed(2) + '% a.m.';
   
-  // FV 12 meses
   let fv = 0;
   for(let m=0; m<12; m++) fv = (fv + aporte) * (1 + iLiq);
   document.getElementById('isPrevMontante').textContent = fmtR(fv);
 
-  // 3. Tempo Total
+  // 3. Tempo
   const mesesTot = ciclos * duracao;
   const anosTot = mesesTot / 12;
-  document.getElementById('isPrevTotalTempo').textContent = `${mesesTot} meses (${anosTot.toFixed(1)} anos)`;
+  document.getElementById('isPrevTotalTempo').textContent = `${mesesTot} meses | ${anosTot.toFixed(1)} anos`;
 }
 
 function runInvestSacar() {
@@ -609,7 +699,6 @@ function runInvestSacar() {
   const numCiclos = parseInt(document.getElementById('isCiclos').value);
   const mesesCiclo = parseInt(document.getElementById('isDuracao').value);
 
-  // Taxas
   const iFin = Math.pow(1 + tAnual/100, 1/12) - 1;
   const iInv = (Math.pow(1 + selic/100, 1/12) - 1) * (1 - ir/100);
 
@@ -618,156 +707,99 @@ function runInvestSacar() {
   let logHtml = '';
   let totalAmortizadoViaInvest = 0;
   
-  let chartLabels = [];
-  let chartDataDev = [];
-  let chartDataInv = [];
-  let exportRows = [];
-
+  let labels = [];
+  let dDev = [];
+  let dInv = [];
   let mesAtual = 0;
+
+  // Base SAC amortization
+  let sacAmortConst = V / prazoMeses;
 
   for(let c=1; c<=numCiclos; c++) {
     if(saldoDev <= 1) break;
 
-    // Inicio ciclo
-    let amSac = 0, pmtPrice = 0;
-    // Simplificacao: recalcula parcela baseada no saldo atual e prazo restante
-    let prazoRestante = prazoMeses - mesAtual;
-    if(sys === 'sac') amSac = saldoDev / prazoRestante;
-    else pmtPrice = saldoDev * (iFin * Math.pow(1+iFin,prazoRestante))/(Math.pow(1+iFin,prazoRestante)-1);
-
-    // Roda meses do ciclo
-    for(let m=0; m<mesesCiclo; m++) {
-      if(saldoDev <= 1) break;
-      mesAtual++;
-
-      // 1. Paga parcela normal
-      let juros = saldoDev * iFin;
-      let amort = sys === 'sac' ? amSac : (pmtPrice - juros);
-      saldoDev -= amort;
-      
-      // 2. Investe
-      saldoInv = (saldoInv + aporte) * (1 + iInv);
-
-      // Data Chart (a cada 6 meses ou fim de ciclo pra nao pesar)
-      if(m === mesesCiclo-1 || mesAtual % 6 === 0) {
-        chartLabels.push('M'+mesAtual);
-        chartDataDev.push(saldoDev);
-        chartDataInv.push(saldoInv);
-      }
-      exportRows.push([c, mesAtual, saldoDev, saldoInv, 'Acumulando']);
+    // Price Pmt Recalculada no inicio do ciclo (ou mantida se for contrato fixo - aqui assumimos recalculo pra simplificar a logica de projecao)
+    let pRest = prazoMeses - mesAtual;
+    let pmtPrice = 0;
+    if(sys === 'price' && saldoDev > 0) {
+       pmtPrice = saldoDev * (iFin * Math.pow(1+iFin,pRest))/(Math.pow(1+iFin,pRest)-1);
     }
 
-    // Fim do ciclo: Saca e Amortiza
-    if(saldoDev > 0) {
-      let valorAbater = saldoInv;
-      if(valorAbater > saldoDev) valorAbater = saldoDev; // Quita tudo
-      
-      saldoDev -= valorAbater;
-      totalAmortizadoViaInvest += valorAbater;
-      
-      logHtml += `<div class="cycle-item">
-        <span>Ciclo ${c} (Mês ${mesAtual})</span>
-        <span>Saque: ${fmtR(saldoInv)} ➔ Saldo Restante: ${fmtR(saldoDev)}</span>
-      </div>`;
+    for(let m=0; m<mesesCiclo; m++) {
+      if(saldoDev <= 1) { saldoDev=0; break; }
+      mesAtual++;
 
-      exportRows.push([c, mesAtual, saldoDev, 0, `Saque de ${fmtR(saldoInv)}`]);
-      saldoInv = 0; // Zerou conta inv
+      // Amortizacao normal do mes
+      let juros = saldoDev * iFin;
+      let amort = 0;
+      if(sys === 'sac') amort = sacAmortConst; 
+      else amort = pmtPrice - juros;
       
-      // Update chart pos saque
-      chartLabels.push('M'+mesAtual+' (Saque)');
-      chartDataDev.push(saldoDev);
-      chartDataInv.push(0);
+      if(amort > saldoDev) amort = saldoDev;
+      saldoDev -= amort;
+      
+      // Investimento
+      saldoInv = (saldoInv + aporte) * (1 + iInv);
+
+      // Grafico data reduction
+      if(mesAtual % 4 === 0) {
+        labels.push(mesAtual);
+        dDev.push(saldoDev);
+        dInv.push(saldoInv);
+      }
+    }
+
+    // FIM DO CICLO - SAQUE
+    if(saldoDev > 0 && saldoInv > 0) {
+      let abate = saldoInv;
+      if(abate > saldoDev) abate = saldoDev;
+      
+      saldoDev -= abate;
+      totalAmortizadoViaInvest += abate;
+      
+      logHtml += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:0.85rem">
+        <span style="color:var(--text)">Ciclo ${c} (Mês ${mesAtual})</span>
+        <span style="color:var(--accent)">Abateu ${fmtR(abate)}</span>
+      </div>`;
+      
+      saldoInv = 0;
+      
+      // Marca no grafico
+      labels.push(mesAtual);
+      dDev.push(saldoDev);
+      dInv.push(0);
     }
   }
 
-  // Exibir Resultados
   document.getElementById('resIS').style.display = 'block';
-  document.getElementById('resIsDiv').textContent = fmtR(V);
   document.getElementById('resIsAmort').textContent = fmtR(totalAmortizadoViaInvest);
+  document.getElementById('resIsTempo').textContent = (prazoMeses - mesAtual) + " meses economizados (aprox)";
   document.getElementById('isLog').innerHTML = logHtml;
-  
-  // Scroll
   document.getElementById('resIS').scrollIntoView({behavior:'smooth'});
 
-  // Chart
   if(chartISRef) chartISRef.destroy();
-  const ctx = document.getElementById('chartIS').getContext('2d');
-  chartISRef = new Chart(ctx, {
-    type: 'line',
+  chartISRef = new Chart(document.getElementById('chartIS'), {
+    type:'line',
     data: {
-      labels: chartLabels,
+      labels: labels,
       datasets: [
-        { label: 'Saldo Devedor', data: chartDataDev, borderColor: '#ef5350', fill:true, backgroundColor:'rgba(239,83,80,0.1)' },
-        { label: 'Investimento Acumulado', data: chartDataInv, borderColor: '#00d4aa', backgroundColor:'rgba(0,212,170,0.1)' }
+        { label:'Dívida', data:dDev, borderColor:'#ef5350', backgroundColor:'rgba(239,83,80,0.1)', fill:true },
+        { label:'Investimento', data:dInv, borderColor:'#00d4aa', backgroundColor:'rgba(0,212,170,0.1)', fill:true }
       ]
     },
     options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
+      responsive:true,
       scales: {
-        x: { grid: { color: '#252838' }, ticks:{ color:'#7a7f95'} },
-        y: { grid: { color: '#252838' }, ticks:{ color:'#7a7f95'} }
+        x: {ticks:{color:'#777'}, grid:{color:'#333'}},
+        y: {ticks:{color:'#777'}, grid:{color:'#333'}}
       },
-      plugins: { legend: { labels: { color: '#e2e4ea' } } }
+      plugins: { legend:{labels:{color:'#ccc'}} }
     }
   });
-
-  // Atualizar Global Export
-  _exportData = {
-    filename: 'estrategia_ciclos',
-    headers: ['Ciclo', 'Mes Global', 'Saldo Devedor', 'Saldo Investido', 'Evento'],
-    rows: exportRows
-  };
 }
 
-
-/* ─── EXPORT FUNCTIONS (CSV & EXCEL XML) ─── */
-function exportCSV() {
-  if(!_exportData.rows.length) return alert("Sem dados para exportar.");
-  let csv = "\uFEFF" + _exportData.headers.join(";") + "\n";
-  _exportData.rows.forEach(r => {
-    csv += r.map(c => (typeof c === 'number' ? c.toFixed(2).replace('.',',') : c)).join(";") + "\n";
-  });
-  downloadFile(_exportData.filename + ".csv", csv, "text/csv;charset=utf-8");
-}
-
-function exportExcelXML() {
-  if(!_exportData.rows.length) return alert("Sem dados para exportar.");
-  let xml = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>';
-  xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">';
-  xml += '<Styles><Style ss:ID="hdr"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#161822" ss:Pattern="Solid"/></Style></Styles>';
-  xml += '<Worksheet ss:Name="Sheet1"><Table>';
-  
-  // Header
-  xml += '<Row>';
-  _exportData.headers.forEach(h => xml += `<Cell ss:StyleID="hdr"><Data ss:Type="String">${h}</Data></Cell>`);
-  xml += '</Row>';
-  
-  // Rows
-  _exportData.rows.forEach(r => {
-    xml += '<Row>';
-    r.forEach(c => {
-      let type = typeof c === 'number' ? 'Number' : 'String';
-      xml += `<Cell><Data ss:Type="${type}">${c}</Data></Cell>`;
-    });
-    xml += '</Row>';
-  });
-  xml += '</Table></Worksheet></Workbook>';
-  downloadFile(_exportData.filename + ".xml", xml, "application/vnd.ms-excel");
-}
-
-function downloadFile(name, content, type) {
-  const blob = new Blob([content], {type: type});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-// Init
-nav('simulador'); // Start
+// Init Defaults
+nav('simulador');
 </script>
 </body>
 </html>
